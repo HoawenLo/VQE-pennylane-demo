@@ -1,0 +1,11 @@
+device_type: "default.qubit"
+
+circuit_params:
+  ansatz_type: "hea"
+  num_qubits: 14
+
+  # Hardware efficient ansatz params
+  num_layers: 2
+
+training_params:
+  epochs: 50
