@@ -1,11 +1,20 @@
 device_type: "default.qubit"
 
+data_params:
+  pennylane_molecule_dataset:
+    molecule_name: "CH2"
+    bond_length: 1.085
+
 circuit_params:
   ansatz_type: "hea"
   num_qubits: 14
 
   # Hardware efficient ansatz params
-  num_layers: 2
+  num_layers: 3
 
 training_params:
-  epochs: 50
+  epochs: 75
+
+visualisation_params:
+  show_circuit: False
+  show_loss_graph: False

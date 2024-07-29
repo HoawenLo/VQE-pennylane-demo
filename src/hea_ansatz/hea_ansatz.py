@@ -79,7 +79,6 @@ def hea_circuit_base(device):
             
     Returns:
         (Qnode) A qnode function which is a Pennylane circuit."""
-
     @qml.qnode(device=device, interface="torch")
     def hea_circuit(num_qubits, num_layers, params, hamiltonian):
         """Create a quantum circuit with a hardware efficient ansatz.

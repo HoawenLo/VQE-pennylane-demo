@@ -1,9 +1,8 @@
 import torch
 
-from ..circuit_functions.circuit import loss_fn
 from ..circuit_functions.setup_device import setup_device
 
-def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian):
+def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn):
     """Train the variational quantum circuit.
     
     Args:
@@ -13,8 +12,9 @@ def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs,
         variational_circuit_params (torch.Tensor): The variational circuit parameters that
             are optimised to find the best quantum circuit.
         device (pennylane.devices): The quantum hardware to be used.
-        hamiltonian (pennylane.Hamiltonian): The hamiltonian to fo minimise 
-                the energy expectation value for.
+        hamiltonian (pennylane.Hamiltonian): The hamiltonian to minimise the
+            energy expectation value for.
+        loss_fn (function): The quantum circuit.
     
     Returns:
         (tuple) Returns a tuple of the final parameters and the final loss function value."""

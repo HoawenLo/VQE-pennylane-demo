@@ -2,6 +2,7 @@ import pennylane as qml
 import matplotlib.pyplot as plt
 
 from ..hea_ansatz.hea_ansatz import hea_circuit_base
+from ..circuit_functions.setup_device import setup_device
 
 def display_circuit(ansatz_type, ansatz_config_params, variational_circuit_params, device, hamiltonian):
     """Display a circuit ansatz, either hea or uccsd.
@@ -18,7 +19,8 @@ def display_circuit(ansatz_type, ansatz_config_params, variational_circuit_param
 
     Returns:
         None"""
-    
+    device = setup_device(device, ansatz_config_params["num_qubits"])
+
     if ansatz_type == "hea":
         num_qubits = ansatz_config_params["num_qubits"]
         num_layers = ansatz_config_params["num_layers"]
