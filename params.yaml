@@ -2,8 +2,8 @@ device_type: "default.qubit"
 
 data_params:
   pennylane_molecule_dataset:
-    molecule_name: "CH2"
-    bond_length: 1.085
+    molecule_name: "BH3"
+    bond_length: 1.189
 
 circuit_params:
   ansatz_type: "hea"
@@ -13,7 +13,7 @@ circuit_params:
   num_layers: 3
 
 training_params:
-  epochs: 75
+  epochs: 2
 
 visualisation_params:
   show_circuit: False

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
 
-def create_loss_graph(results, fci_energy, final_loss_value):
+def create_loss_graph(results, fci_energy, molecule_chemical_symbol, number_layers, number_epochs):
     """Creates a graph which visualises the change of loss over time.
     Where the loss is the expectation value for hamiltonian.
 
@@ -13,6 +13,9 @@ def create_loss_graph(results, fci_energy, final_loss_value):
             over time.
         fci_energy: Full configuration energy, and exact solution to the Schrodinger equations
             for a particular system.
+        molecule_chemical_symbol (str): The molecule chemical symbol to be added in the title.
+        number_layers (str): The number of layers of the hardware efficient ansatz.
+        number_epochs (int): The number of epochs.
 
 
     Returns:
@@ -38,7 +41,7 @@ def create_loss_graph(results, fci_energy, final_loss_value):
     ax1.text(num_data_points - 1, fci_energy, fci_energy, fontsize=10)
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    plt.title("Energy expectation value over training epochs", fontsize=16)
+    plt.title(f"Energy expectation value over {number_epochs} training epochs for {molecule_chemical_symbol} with {number_layers} layers of a hardware efficient ansatz", fontsize=16)
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
     

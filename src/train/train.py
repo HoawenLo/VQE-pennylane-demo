@@ -1,7 +1,9 @@
+import pennylane as qml
 import torch
 
 from ..circuit_functions.setup_device import setup_device
 
+@qml.qjit
 def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn):
     """Train the variational quantum circuit.
     

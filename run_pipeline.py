@@ -34,7 +34,7 @@ def run_pipeline(yaml_filepath="params.yaml"):
     loss_function = loss_fn
     results, variational_circuit_params, loss = train(ansatz_type, ansatz_params, torch_params, epochs, device, hamiltonian, loss_function)
 
-    create_loss_graph(results, fci_energy, loss)
+    create_loss_graph(results, fci_energy, molecule_name, num_layers, epochs)
     output_graph(show_loss_graph)
 
     return results, variational_circuit_params, loss
