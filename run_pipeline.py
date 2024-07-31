@@ -10,6 +10,7 @@ def run_pipeline(yaml_filepath="params.yaml"):
     """Master train function."""
     parameters = load_and_extract_parameters_from_config(yaml_filepath)
     
+    data_type = parameters["data_type"]
     ansatz_type = parameters["ansatz_type"]
     num_layers = parameters["num_layers"]
     epochs = parameters["epochs"]
@@ -18,8 +19,13 @@ def run_pipeline(yaml_filepath="params.yaml"):
     bond_length = parameters["bond_length"]
     show_circuit = parameters["show_circuit"]
     show_loss_graph = parameters["show_loss_graph"]
+    input_symbols = parameters["input_symbols"]
+    input_coordinates = parameters["input_coordinates"]
+    input_fci_energy = parameters["fci_energy"]
 
-    molecular_dataset = run_pennylane_molecular_dataset_pipeline(molecule_name, bond_length)
+    molecular_dataset = run_pennylane_molecular_dataset_pipeline(
+        data_type, molecule_name, bond_length, input_symbols, input_coordinates, input_fci_energy
+    )
 
     hamiltonian = molecular_dataset["hamiltonian"]
     num_qubits = molecular_dataset["num_qubits"]

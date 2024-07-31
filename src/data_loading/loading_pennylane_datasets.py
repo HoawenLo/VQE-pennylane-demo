@@ -1,4 +1,5 @@
 import pennylane as qml
+from pennylane import numpy as np
 
 def load_pennylane_molecule_dataset(molecule_name, bond_length):
     """Load a Pennylane molecule dataset. Data provided for the molecules includes
@@ -32,18 +33,47 @@ def extract_dataset_information(molecular_dataset):
     data = {"hamiltonian":H, "num_qubits":qubits, "fci_energy":fci_energy}
     return data
 
-def run_pennylane_molecular_dataset_pipeline(molecule_name, bond_length):
+def create_manual_hamiltonian(input_symbols, input_coordinates):
+    """Create a manual molecular Hamiltonian from input symbols and coordinates.
+
+    Args:
+        input_symbols (list): A list of strings which have the chemical symbol of the Hamiltonian.
+        input_coordinates (np.array): A numpy array of coordinates of each atom.
+
+    Returns:
+        (dict) A dictionary with the hamiltonian and number of qubits."""
+    input_coordinates = np.array(input_coordinates)
+    molecule = qml.qchem.Molecule(input_symbols, input_coordinates)
+    H, qubits = qml.qchem.molecular_hamiltonian(molecule)
+    return {"hamiltonian":H, "num_qubits":qubits}
+
+def run_pennylane_molecular_dataset_pipeline(data_type, molecule_name, bond_length, input_symbols, input_coordinates, fci_energy):
     """Run the entire data pipeline for extracting the data from a pennylane molecular
     dataset.
     
     Args:
+        data_type (str): The data loading method. Input preset will extract the molecular data from
+            qml.data.load(), Pennylane's presets, whilst the input manual_inputs will generate a 
+            molecular hamiltonian and number of qubits from input coordinates.
         molecule_name (str): The chemical formula of a molecule.
         bond_length (float): The bond length of the molecule.
+        input_symbols (list): A list of strings which have the chemical symbol of the Hamiltonian.
+        input_coordinates (np.array): A numpy array of coordinates of each atom.
+        fci_energy (float): The full configuration energy, an exact solution to the Schrodinger equation for
+            a particular quantum system's configuration.
 
     Returns:
         (dict) Returns a dictionary containing the Hamiltonian, number of qubits and fci energy."""
 
-    molecular_dataset = load_pennylane_molecule_dataset(molecule_name, bond_length)
-    data = extract_dataset_information(molecular_dataset)
+    if data_type == "preset":
+        molecular_dataset = load_pennylane_molecule_dataset(molecule_name, bond_length)
+        data = extract_dataset_information(molecular_dataset)
+    elif data_type == "manual_inputs":
+        data = create_manual_hamiltonian(input_symbols, input_coordinates)
+        data["fci_energy"] = fci_energy
+    else:
+        raise ValueError(
+            f"The parameter input data_type is invalid. It must either be preset or manual_inputs. The parameter data_type is instead {data_type}."
+        )
     return data
 

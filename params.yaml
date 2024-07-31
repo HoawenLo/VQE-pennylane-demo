@@ -1,19 +1,26 @@
 device_type: "default.qubit"
 
 data_params:
+  data_type: "manual_inputs"
+
   pennylane_molecule_dataset:
-    molecule_name: "BH3"
-    bond_length: 1.189
+    molecule_name: "H2"
+    bond_length: 0.7420
+
+  manual_inputs:
+    input_symbols: ["H", "H"]
+    input_coordinates: [[0.3710, 0.0, 0.0], [-0.3710, 0.0, 0.0]]
+    fci_energy: -1.174475
 
 circuit_params:
   ansatz_type: "hea"
   num_qubits: 14
 
   # Hardware efficient ansatz params
-  num_layers: 3
+  num_layers: 5
 
 training_params:
-  epochs: 2
+  epochs: 75
 
 visualisation_params:
   show_circuit: False
