@@ -78,7 +78,7 @@ Add name of virtual environment
 *.pyc
 name_of_virtual_environment # Add here
 ...
-
+```
 Pip install the requirements
 ```
 pip3 install -r requirements.txt
