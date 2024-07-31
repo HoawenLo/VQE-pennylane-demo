@@ -46,7 +46,7 @@ def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs,
         results["theta_param"].append(parameter_value)
         results["energy_expectation_value"].append(loss.detach().numpy())
 
-        print(f"Epoch {i + 1}: Loss = {loss.item():.8f} Ha, Theta = {variational_circuit_params.detach().numpy()}")
+        print(f"Epoch {i + 1}: Loss = {loss.item():.8f} Ha")
 
     print(f"Final parameters: {variational_circuit_params}")
     print(f"Final loss: {loss:.4f}")

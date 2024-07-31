@@ -1,6 +1,8 @@
 import pennylane as qml
 from pennylane import numpy as np
 
+from ..logging.log import get_logger
+
 def load_pennylane_molecule_dataset(molecule_name, bond_length):
     """Load a Pennylane molecule dataset. Data provided for the molecules includes
     the Hamiltonian, number of qubits required based off the number of electrons in the
@@ -15,7 +17,9 @@ def load_pennylane_molecule_dataset(molecule_name, bond_length):
         (pennylane.data.base.dataset) We only have one particular input configuration of the
         molecule hence the dataset corresponding to that input configuration is the returned
         object."""
+    logger = get_logger("Data")
 
+    logger.info(f"Loading pennylane dataset, molecule_name: {molecule_name}, bond_length{bond_length}.")
     dataset = qml.data.load("qchem", molname=molecule_name, bondlength=bond_length, basis="STO-3G", attributes=["fci_energy", "hamiltonian"])[0]
     return dataset
 
@@ -28,9 +32,12 @@ def extract_dataset_information(molecular_dataset):
 
     Returns:
         (dict) Returns a dictionary containing the Hamiltonian, number of qubits and fci energy."""
-    
+    logger = get_logger("Data")
+
+    logger.info(f"Extracting data from molecular dataset.")
     H, qubits, fci_energy = molecular_dataset.hamiltonian, len(molecular_dataset.hamiltonian.wires), molecular_dataset.fci_energy
     data = {"hamiltonian":H, "num_qubits":qubits, "fci_energy":fci_energy}
+    logger.info(f"Extracted Hamiltonian, number of qubits and full configuration energy: {data}")
     return data
 
 def create_manual_hamiltonian(input_symbols, input_coordinates):
@@ -42,9 +49,21 @@ def create_manual_hamiltonian(input_symbols, input_coordinates):
 
     Returns:
         (dict) A dictionary with the hamiltonian and number of qubits."""
+    logger = get_logger("Data")
+
+    logger.info("Creating Hamiltonian from manual inputs.")
+    print(f"Paramters:")
+    print(f"input_coordinates:")
+    print(input_coordinates)
+    print(f"input_symbols:")
+    print(input_symbols)
     input_coordinates = np.array(input_coordinates)
     molecule = qml.qchem.Molecule(input_symbols, input_coordinates)
     H, qubits = qml.qchem.molecular_hamiltonian(molecule)
+    logger.info("Output Hamiltonian and number of qubits.")
+    print("Hamiltonian")
+    print(H)
+    print(f"Number of qubits: {qubits}")
     return {"hamiltonian":H, "num_qubits":qubits}
 
 def run_pennylane_molecular_dataset_pipeline(data_type, molecule_name, bond_length, input_symbols, input_coordinates, fci_energy):

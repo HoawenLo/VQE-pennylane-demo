@@ -1,15 +1,29 @@
+import argparse
+
 from src.circuit_functions.circuit import loss_fn
 from src.data_loading.extract_params_from_yaml import load_and_extract_parameters_from_config
 from src.data_loading.loading_pennylane_datasets import run_pennylane_molecular_dataset_pipeline
+from src.logging.log import get_logger
 from src.hea_ansatz.hea_ansatz import create_hea_params
 from src.train.train import train
 from src.visualisation.display_circuit import display_circuit
 from src.visualisation.visualisation import create_loss_graph, output_graph
 
-def run_pipeline(yaml_filepath="params.yaml"):
-    """Master train function."""
-    parameters = load_and_extract_parameters_from_config(yaml_filepath)
+def run_pipeline(config_path):
+    """Master pipeline function. Load data. Create parameters and train quantum circuit.
     
+    Args:
+        config_path (str): The filepath to params.yaml file which is a yaml file holding 
+            parameters.
+            
+    Returns:
+        None"""
+    logger = get_logger("Master pipeline")
+
+    logger.info(f"Loading parameters from parameter config yaml file.")
+    parameters = load_and_extract_parameters_from_config(config_path)
+    
+    logger.info(f"Extracting parameters from parameter dictionary.")
     data_type = parameters["data_type"]
     ansatz_type = parameters["ansatz_type"]
     num_layers = parameters["num_layers"]
@@ -22,7 +36,16 @@ def run_pipeline(yaml_filepath="params.yaml"):
     input_symbols = parameters["input_symbols"]
     input_coordinates = parameters["input_coordinates"]
     input_fci_energy = parameters["fci_energy"]
+    export_graph = parameters["export_graph"]
 
+    if data_type == "preset":
+        logger.info(f"Loading preset Pennylane molecular dataset.")
+    elif data_type == "manual_inputs":
+        logger.info(f"Building molecular dataset with manual inputs.")
+    else:
+        raise ValueError(
+            f"The parameter input data_type is invalid. It must either be preset or manual_inputs. The parameter data_type is instead {data_type}."
+        )
     molecular_dataset = run_pennylane_molecular_dataset_pipeline(
         data_type, molecule_name, bond_length, input_symbols, input_coordinates, input_fci_energy
     )
@@ -37,10 +60,27 @@ def run_pipeline(yaml_filepath="params.yaml"):
     if show_circuit:
         display_circuit(ansatz_type, ansatz_params, torch_params, device, hamiltonian)
     
+    logger.info(f"Training quantum circuit.")
     loss_function = loss_fn
     results, variational_circuit_params, loss = train(ansatz_type, ansatz_params, torch_params, epochs, device, hamiltonian, loss_function)
 
+    logger.info(f"Creating graph of results.")
     create_loss_graph(results, fci_energy, molecule_name, num_layers, epochs)
-    output_graph(show_loss_graph)
+    
+    if export_graph:
+        logger.info(f"Outputting graph of results.")
+        output_graph(show_loss_graph)
 
     return results, variational_circuit_params, loss
+
+if __name__ == "__main__":
+    # Create an parser
+    parser = argparse.ArgumentParser("Train quantum circuit.")
+
+    # Add config argument
+    parser.add_argument("--config", dest="config", help="Params.yaml filepath", required=True)
+
+    # Parse arguments
+    args = parser.parse_args()
+    
+    run_pipeline(config_path=args.config)

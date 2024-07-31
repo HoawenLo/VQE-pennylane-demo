@@ -1,6 +1,8 @@
 import pennylane as qml
 import torch
 
+from ..logging.log import get_logger
+
 def calculate_params_one_line_hea(num_layers):
     """Calculate the number of parameters in the hardware efficient ansatz.
     Each layer consist of one of each of the rotation gates followed by two 
@@ -27,10 +29,14 @@ def create_hea_params(num_qubits, num_layers):
     Returns:
         (torch.Tensor) A set of parameters of shape (num_qubits, num_layers * 3)"""
 
+    logger = get_logger("Gate parameters")
+
+    logger.info("Create gate parameters.")
     param_number = calculate_params_one_line_hea(num_layers)
     torch_random_values = torch.randn([num_qubits, param_number], requires_grad=True) * 0.1
     torch_params = torch.nn.Parameter(torch_random_values)
-
+    logger.info("Gate parameters:")
+    print(torch_params)
     return torch_params
     
 def create_layer(num_qubits, params, layer_number):

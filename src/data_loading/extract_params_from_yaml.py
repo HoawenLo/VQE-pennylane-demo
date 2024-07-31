@@ -1,5 +1,7 @@
 import yaml
 
+from ..logging.log import get_logger
+
 def extract_parameters(yaml_nested_dict):
     """Extract the parameters into a dictionary from the nested dictionary which holds the parameters
     from the params.yaml file.
@@ -31,7 +33,8 @@ def load_and_extract_parameters_from_config(yaml_filepath):
     
     with open(yaml_filepath, 'r') as file:
         config = yaml.safe_load(file)
+    logger = get_logger("Extract parameters")
 
+    logger.info("Extracting parameters from params.yaml file.")
     output_parameters = extract_parameters(config)
-
     return output_parameters
