@@ -1,13 +1,16 @@
 import argparse
 
+import matplotlib.pyplot as plt
+
 from src.circuit_functions.circuit import loss_fn
 from src.data_loading.extract_params_from_yaml import load_and_extract_parameters_from_config
 from src.data_loading.loading_pennylane_datasets import run_pennylane_molecular_dataset_pipeline
-from src.logging.log import get_logger
 from src.hea_ansatz.hea_ansatz import create_hea_params
+from src.logging.log import get_logger
+from src.output_data.output_data import run_export_pipeline
 from src.train.train import train
 from src.visualisation.display_circuit import display_circuit
-from src.visualisation.visualisation import create_loss_graph, output_graph
+from src.visualisation.visualisation import create_loss_graph, show_graph
 
 def run_pipeline(config_path):
     """Master pipeline function. Load data. Create parameters and train quantum circuit.
@@ -31,12 +34,19 @@ def run_pipeline(config_path):
     device = parameters["device_type"]
     molecule_name = parameters["molecule_name"]
     bond_length = parameters["bond_length"]
+    
     show_circuit = parameters["show_circuit"]
     show_loss_graph = parameters["show_loss_graph"]
+    
+    export_graph = parameters["export_graph"]
+    export_parameters = parameters["export_parameters"]
+    
     input_symbols = parameters["input_symbols"]
     input_coordinates = parameters["input_coordinates"]
     input_fci_energy = parameters["fci_energy"]
-    export_graph = parameters["export_graph"]
+    
+    learning_rate = parameters["learning_rate"]
+    optimiser_type = parameters["optimiser_type"]
 
     if data_type == "preset":
         logger.info(f"Loading preset Pennylane molecular dataset.")
@@ -59,19 +69,32 @@ def run_pipeline(config_path):
 
     if show_circuit:
         display_circuit(ansatz_type, ansatz_params, torch_params, device, hamiltonian)
-    
+
     logger.info(f"Training quantum circuit.")
     loss_function = loss_fn
-    results, variational_circuit_params, loss = train(ansatz_type, ansatz_params, torch_params, epochs, device, hamiltonian, loss_function)
+    results, best_loss, best_parameters = train(
+        ansatz_type, 
+        ansatz_params, 
+        torch_params, 
+        epochs, 
+        device, 
+        hamiltonian, 
+        loss_function, 
+        learning_rate,
+        optimiser_type
+    )
 
     logger.info(f"Creating graph of results.")
     create_loss_graph(results, fci_energy, molecule_name, num_layers, epochs)
-    
-    if export_graph:
-        logger.info(f"Outputting graph of results.")
-        output_graph(show_loss_graph)
 
-    return results, variational_circuit_params, loss
+    if show_loss_graph:
+        show_graph()
+    else:
+        plt.close()
+
+    run_export_pipeline(show_loss_graph)
+
+    return results, best_parameters, best_loss
 
 if __name__ == "__main__":
     # Create an parser

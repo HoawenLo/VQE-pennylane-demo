@@ -67,8 +67,8 @@ def return_new_graph_number():
 
     return graph_number
 
-def output_graph(show_graph=False):
-    """Output the graph showing how the loss changes over time.
+def show_graph(show_graph):
+    """Show the results graph if set to True.
 
     Args:
         show_graph (bool): A bool that indicates whether to show graph or not. If used in jupyter
@@ -77,12 +77,8 @@ def output_graph(show_graph=False):
     Returns:
         None"""
     
-    graph_number = return_new_graph_number()
-    plt.savefig(f"results/energy_expectation_value_{graph_number}.png")
-        
     if show_graph:
         plt.show()
-    else:
         plt.close()
 
     

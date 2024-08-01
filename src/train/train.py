@@ -1,13 +1,16 @@
 from catalyst import qjit
 import jax
 import jaxopt
-import pennylane as qml
+import numpy as np
 import torch
 
 
 from ..circuit_functions.setup_device import setup_device
+from ..optimiser.setup_optimiser import setup_optimiser
+from .find_best_loss_and_best_params import return_best_loss_and_parameters
+from .create_data_dictionary import create_data_dictionary
 
-def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn):
+def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn, learning_rate, optimiser_type):
     """Train the variational quantum circuit using a PyTorch optimiser.
     
     Args:
@@ -20,15 +23,19 @@ def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs,
         hamiltonian (pennylane.Hamiltonian): The hamiltonian to minimise the
             energy expectation value for.
         loss_fn (function): The quantum circuit.
+        optimiser_learning_rate (float): The learning rate of the optimiser.
+        optimiser (torch.optim): An object representing the PyTorch optimiser.
     
     Returns:
-        (tuple) Returns a tuple of the final parameters and the final loss function value."""
+        (tuple) Returns a tuple of all loss values and parameters over the entire training process 
+        for each epoch, the best parameters and the best loss value."""
     device = setup_device(device, ansatz_config_params["num_qubits"])
 
     # Set up optimiser.
-    opt = torch.optim.Adam([variational_circuit_params], lr=0.1)
+    optimiser = setup_optimiser(optimiser_type)
+    opt = optimiser([variational_circuit_params], lr=learning_rate)
 
-    results = {"theta_param":[], 
+    results = {"params":[], 
                "energy_expectation_value":[]}
 
     # Training loop
@@ -43,17 +50,30 @@ def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs,
         opt.step()
         parameter_value = variational_circuit_params.clone().detach().numpy()
 
-        results["theta_param"].append(parameter_value)
+        results["params"].append(parameter_value)
         results["energy_expectation_value"].append(loss.detach().numpy())
 
         print(f"Epoch {i + 1}: Loss = {loss.item():.8f} Ha")
 
-    print(f"Final parameters: {variational_circuit_params}")
+    best_loss, best_parameters = return_best_loss_and_parameters(results)
+
+    print(f"Best parameters: {best_parameters}")
+    print(f"Best loss: {best_loss:.4f}")
     print(f"Final loss: {loss:.4f}")
 
-    return results, variational_circuit_params, loss
+    output_data = create_data_dictionary(
+        best_parameters,
+        best_loss,
+        results["energy_expectation_value"],
+        results["params"],
+        hamiltonian,
+        number_qubits,
+        quantum_circuit
+    )
 
-@qjit
+    return output_data
+
+# @qjit
 def train_jax(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn):
     """Train the variational quantum circuit using a Jax optimiser.
     
