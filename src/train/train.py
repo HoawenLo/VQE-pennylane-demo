@@ -27,8 +27,7 @@ def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs,
         optimiser (torch.optim): An object representing the PyTorch optimiser.
     
     Returns:
-        (tuple) Returns a tuple of all loss values and parameters over the entire training process 
-        for each epoch, the best parameters and the best loss value."""
+        (tuple) """
     device = setup_device(device, ansatz_config_params["num_qubits"])
 
     # Set up optimiser.
@@ -67,8 +66,8 @@ def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs,
         results["energy_expectation_value"],
         results["params"],
         hamiltonian,
-        number_qubits,
-        quantum_circuit
+        ansatz_config_params["num_qubits"],
+        loss_fn
     )
 
     return output_data

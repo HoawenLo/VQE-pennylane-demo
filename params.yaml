@@ -29,5 +29,5 @@ visualisation_params:
   show_loss_graph: True
 
 data_export:
-  export_graph: False
-  export_parameters: False
+  export_graph: True
+  export_parameters: True

@@ -116,7 +116,6 @@ def run_export_pipeline(export_data_param, export_graph_param, data_dictionary):
         number = return_new_directory_number()
         directory_name = create_directory_name(number)
         setup_output_directory(directory_name)
-        
 
     if export_graph_param:
         export_graph(number, directory_name)

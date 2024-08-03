@@ -26,16 +26,16 @@ def create_loss_graph(results, fci_energy, molecule_chemical_symbol, number_laye
     fig.set_figwidth(12)
     
 
-    num_data_points = len(results["energy_expectation_value"])
-    final_data_energy_expectation_value = np.round(results["energy_expectation_value"][-1], 4)
+    num_data_points = len(results)
+    final_data_energy_expectation_value = np.round(results[-1], 4)
     fci_energy = np.round(fci_energy, 4)
     # Add energy plot on column 1
     ax1 = fig.add_subplot(111)
-    ax1.plot(range(0, num_data_points), results["energy_expectation_value"], "go", ls="dashed")
+    ax1.plot(range(0, num_data_points), results, "go", ls="dashed")
     ax1.plot(range(0, num_data_points), np.full(num_data_points, fci_energy), color="red")
     ax1.set_xlabel("Optimization step", fontsize=13)
     ax1.set_ylabel("Energy (Hartree)", fontsize=13)
-    ax1.text(0, results["energy_expectation_value"][0], r"$E_\mathrm{HF}$", fontsize=15)
+    ax1.text(0, results[0], r"$E_\mathrm{HF}$", fontsize=15)
     ax1.text(num_data_points - 1, final_data_energy_expectation_value, final_data_energy_expectation_value, fontsize=10)
     ax1.text(0, fci_energy, r"$E_\mathrm{FCI}$", fontsize=15)
     ax1.text(num_data_points - 1, fci_energy, fci_energy, fontsize=10)
@@ -79,6 +79,8 @@ def show_graph(show_graph):
     
     if show_graph:
         plt.show()
+        plt.close()
+    else:
         plt.close()
 
     

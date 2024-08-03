@@ -72,7 +72,7 @@ def run_pipeline(config_path):
 
     logger.info(f"Training quantum circuit.")
     loss_function = loss_fn
-    results, best_loss, best_parameters = train(
+    output_data = train(
         ansatz_type, 
         ansatz_params, 
         torch_params, 
@@ -85,16 +85,12 @@ def run_pipeline(config_path):
     )
 
     logger.info(f"Creating graph of results.")
-    create_loss_graph(results, fci_energy, molecule_name, num_layers, epochs)
+    create_loss_graph(output_data["loss_data"], fci_energy, molecule_name, num_layers, epochs)
+    show_graph(show_loss_graph)
 
-    if show_loss_graph:
-        show_graph()
-    else:
-        plt.close()
+    run_export_pipeline(export_parameters, export_graph, output_data)
 
-    run_export_pipeline(show_loss_graph)
-
-    return results, best_parameters, best_loss
+    return output_data
 
 if __name__ == "__main__":
     # Create an parser
