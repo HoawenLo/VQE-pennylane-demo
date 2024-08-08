@@ -10,7 +10,37 @@ from ..optimiser.setup_optimiser import setup_optimiser
 from .find_best_loss_and_best_params import return_best_loss_and_parameters
 from .create_data_dictionary import create_data_dictionary
 
-def train(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn, learning_rate, optimiser_type):
+def return_train_function(train_type):
+    """Returns a training function depending on the optimiser architecture.
+
+    Current options include:
+    pytorch: Utilises PyTorch architecture
+
+    Under development:
+    jax: Utilises jax architecture
+    pennylane: Utilises pennylane optimiser architecture
+
+    Args:
+        train_type (str):
+
+    Returns:
+        (function) The training function which is determined by the optimiser architecture."""
+    
+    if train_type == "torch":
+        return train_torch
+    
+    elif train_type == "jax":
+        return train_jax
+    
+    elif train_type == "pennylane":
+        return train_pennylane
+    
+    else:
+        raise ValueError(
+            f"Parameter train_type is invalid. Must either be torch, jax or pennylane; it is currently {train_type}"
+        )
+
+def train_torch(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn, learning_rate, optimiser_type):
     """Train the variational quantum circuit using a PyTorch optimiser.
     
     Args:
@@ -114,3 +144,7 @@ def train_jax(ansatz_type, ansatz_config_params, variational_circuit_params, epo
     print(f"Final loss: {loss:.4f}")
 
     return results, variational_circuit_params, loss
+
+def train_pennylane():
+    """"""
+    pass

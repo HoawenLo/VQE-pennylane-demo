@@ -8,7 +8,7 @@ from src.data_loading.loading_pennylane_datasets import run_pennylane_molecular_
 from src.hea_ansatz.hea_ansatz import create_hea_params
 from src.logging.log import get_logger
 from src.output_data.output_data import run_export_pipeline
-from src.train.train import train
+from src.train.train import return_train_function
 from src.visualisation.display_circuit import display_circuit
 from src.visualisation.visualisation import create_loss_graph, show_graph
 
@@ -47,6 +47,7 @@ def run_pipeline(config_path):
     
     learning_rate = parameters["learning_rate"]
     optimiser_type = parameters["optimiser_type"]
+    train_type = parameters["train_type"]
 
     if data_type == "preset":
         logger.info(f"Loading preset Pennylane molecular dataset.")
@@ -70,6 +71,10 @@ def run_pipeline(config_path):
     if show_circuit:
         display_circuit(ansatz_type, ansatz_params, torch_params, device, hamiltonian)
 
+    
+    logger.info(f"Setup training architecture, selected architecture: {train_type}")
+    train = return_train_function(train_type)
+    
     logger.info(f"Training quantum circuit.")
     loss_function = loss_fn
     output_data = train(

@@ -20,14 +20,15 @@ circuit_params:
   num_layers: 5
 
 training_params:
+  train_type: "torch"
   epochs: 2
   learning_rate: 0.01
   optimiser_type: "torch_adam"
 
 visualisation_params:
-  show_circuit: False
+  show_circuit: True
   show_loss_graph: True
 
 data_export:
-  export_graph: True
-  export_parameters: True
+  export_graph: False
+  export_parameters: False
