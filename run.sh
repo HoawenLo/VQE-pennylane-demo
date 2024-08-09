@@ -1,0 +1,1 @@
+python run_pipeline.py --config=params.yaml

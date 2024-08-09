@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
 
-def create_loss_graph(results, fci_energy, molecule_chemical_symbol, number_layers, number_epochs):
+def create_loss_graph(output_data, master_dictionary):
     """Creates a graph which visualises the change of loss over time.
     Where the loss is the expectation value for hamiltonian.
 
     Args:
-        results (dict): A dictionary which holds the loss data and the change of parameters
+        output_data (dict): A dictionary which holds the loss data and the change of parameters
             over time.
         fci_energy: Full configuration energy, and exact solution to the Schrodinger equations
             for a particular system.
@@ -20,13 +20,17 @@ def create_loss_graph(results, fci_energy, molecule_chemical_symbol, number_laye
 
     Returns:
         None"""
-    
+
+    ansatz_type = master_dictionary["ansatz_type"]
+    fci_energy = master_dictionary["fci_energy"]
+    number_epochs= master_dictionary["epochs"]
+    results = output_data["loss_data"]
+
     fig = plt.figure()
     fig.set_figheight(5)
     fig.set_figwidth(12)
     
-
-    num_data_points = len(results)
+    num_data_points = len(output_data["loss_data"])
     final_data_energy_expectation_value = np.round(results[-1], 4)
     fci_energy = np.round(fci_energy, 4)
     # Add energy plot on column 1
@@ -41,7 +45,10 @@ def create_loss_graph(results, fci_energy, molecule_chemical_symbol, number_laye
     ax1.text(num_data_points - 1, fci_energy, fci_energy, fontsize=10)
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    plt.title(f"Energy expectation value over {number_epochs} training epochs for {molecule_chemical_symbol} with {number_layers} layers of a hardware efficient ansatz", fontsize=16)
+    if ansatz_type == "hea":
+        molecule_chemical_symbol = master_dictionary["molecule_name"]
+        number_layers = master_dictionary["num_layers"]
+        plt.title(f"Energy expectation value over {number_epochs} training epochs for {molecule_chemical_symbol} with {number_layers} layers of a hardware efficient ansatz", fontsize=16)
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
     

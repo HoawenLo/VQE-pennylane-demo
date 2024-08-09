@@ -1,44 +1,39 @@
-from ..hea_ansatz.hea_ansatz import hea_circuit_base
+from ..ansatz.hea_ansatz.hea_ansatz import hea_circuit_base
+from ..ansatz.uccsd_ansatz.preset_pennylane_uccsd_ansatz import preset_pennylane_uccsd_circuit_base
 
 
-def run_circuit(ansatz_type, ansatz_config_params, variational_circuit_params, device, hamiltonian):
+def run_circuit(master_dictionary, device):
     """Create a circuit ansatz, either hea or uccsd.
     
     Args:
-        ansatz_type (str): The circuit ansatz type to be created.
-        ansatz_config_params (dict): The parameters for each ansatz type contained
-            within a dictionary.
-        variational_circuit_params (torch.Tensor): The variational circuit parameters that
-            are optimised to find the best quantum circuit.
+        master_dictionary (dict): A dictionary which holds all yaml parameters, molecular data values and ansatz
+            input parameters.
         device (pennylane.devices): The quantum hardware to be used.
-        hamiltonian (pennylane.Hamiltonian): The hamiltonian to fo minimise 
-                the energy expectation value for.
 
     Returns:
         (torch.Tensor) A torch tensor scalar representing the expectation value of the
             Hamiltonian."""
     
+    ansatz_type = master_dictionary["ansatz_type"]
+
     if ansatz_type == "hea":
-        num_qubits = ansatz_config_params["num_qubits"]
-        num_layers = ansatz_config_params["num_layers"]
         hea_circuit = hea_circuit_base(device)
-        circuit_result = hea_circuit(num_qubits, num_layers, variational_circuit_params, hamiltonian)
-    
+        circuit_result = hea_circuit(master_dictionary)
+    elif ansatz_type == "preset_pennylane_uccsd":
+        preset_pennylane_uccsd_circuit = preset_pennylane_uccsd_circuit_base(device)
+
+
     return circuit_result
 
-def loss_fn(ansatz_type, ansatz_config_params, variational_circuit_params, device, hamiltonian):
+def loss_fn(master_dictionary, device):
     """Calculate the loss value.
     
     Args:
-        ansatz_type (str): The circuit ansatz type to be created.
-        ansatz_config_params (dict): The parameters for each ansatz type contained
-            within a dictionary.
-        variational_circuit_params (torch.Tensor): The variational circuit parameters that
-            are optimised to find the best quantum circuit.
-        hamiltonian (pennylane.Hamiltonian): The hamiltonian to fo minimise 
-                the energy expectation value for.
+        master_dictionary (dict): A dictionary which holds all yaml parameters, molecular data values and ansatz
+            input parameters.
+        device (pennylane.devices): The quantum hardware to be used.
 
     Returns:
         (torch.Tensor) A torch tensor scalar representing the expectation value of the
             Hamiltonian."""
-    return run_circuit(ansatz_type, ansatz_config_params, variational_circuit_params, device, hamiltonian)
+    return run_circuit(master_dictionary, device)

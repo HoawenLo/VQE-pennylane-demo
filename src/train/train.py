@@ -40,25 +40,25 @@ def return_train_function(train_type):
             f"Parameter train_type is invalid. Must either be torch, jax or pennylane; it is currently {train_type}"
         )
 
-def train_torch(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn, learning_rate, optimiser_type):
+def train_torch(master_dictionary, loss_fn):
     """Train the variational quantum circuit using a PyTorch optimiser.
     
     Args:
-        ansatz_type (str): The circuit ansatz type to be created.
-        ansatz_config_params (dict): The parameters for each ansatz type contained
-            within a dictionary.
-        variational_circuit_params (torch.Tensor): The variational circuit parameters that
-            are optimised to find the best quantum circuit.
-        device (pennylane.devices): The quantum hardware to be used.
-        hamiltonian (pennylane.Hamiltonian): The hamiltonian to minimise the
-            energy expectation value for.
+        master_dictionary (dict): A dictionary which holds all yaml parameters, molecular data values and ansatz
+            input parameters.
         loss_fn (function): The quantum circuit.
-        optimiser_learning_rate (float): The learning rate of the optimiser.
-        optimiser (torch.optim): An object representing the PyTorch optimiser.
-    
     Returns:
-        (tuple) """
-    device = setup_device(device, ansatz_config_params["num_qubits"])
+        () """
+    
+    device_type = master_dictionary["device_type"]
+    epochs = master_dictionary["epochs"]
+    hamiltonian = master_dictionary["hamiltonian"]
+    learning_rate = master_dictionary["learning_rate"]
+    optimiser_type = master_dictionary["optimiser_type"]
+    num_qubits = master_dictionary["num_qubits"]
+    variational_circuit_params = master_dictionary["ansatz_config_params"]["variational_circuit_parameters"]
+
+    device = setup_device(device_type, num_qubits)
 
     # Set up optimiser.
     optimiser = setup_optimiser(optimiser_type)
@@ -74,7 +74,7 @@ def train_torch(ansatz_type, ansatz_config_params, variational_circuit_params, e
 
         # Run both the forward pass and calculate cost function.
         # Remember cost function is the expectation value.
-        loss = loss_fn(ansatz_type, ansatz_config_params, variational_circuit_params, device, hamiltonian)
+        loss = loss_fn(master_dictionary, device)
         loss.backward()
         opt.step()
         parameter_value = variational_circuit_params.clone().detach().numpy()
@@ -96,7 +96,7 @@ def train_torch(ansatz_type, ansatz_config_params, variational_circuit_params, e
         results["energy_expectation_value"],
         results["params"],
         hamiltonian,
-        ansatz_config_params["num_qubits"],
+        master_dictionary["num_qubits"],
         loss_fn
     )
 
