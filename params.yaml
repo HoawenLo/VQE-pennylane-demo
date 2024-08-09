@@ -13,9 +13,9 @@ data_params:
     fci_energy: -1.174475
 
 circuit_params:
-  ansatz_type: "hea"
-  num_qubits: 14
-  num_electrons: 0
+  ansatz_type: "preset_pennylane_uccsd"
+  num_qubits: 4
+  num_electrons: 2
 
   # Hardware efficient ansatz params
   num_layers: 5
@@ -27,7 +27,7 @@ training_params:
   optimiser_type: "torch_adam"
 
 visualisation_params:
-  show_circuit: False
+  show_circuit: True
   show_loss_graph: True
 
 data_export:

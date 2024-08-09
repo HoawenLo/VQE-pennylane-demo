@@ -21,7 +21,7 @@ def run_circuit(master_dictionary, device):
         circuit_result = hea_circuit(master_dictionary)
     elif ansatz_type == "preset_pennylane_uccsd":
         preset_pennylane_uccsd_circuit = preset_pennylane_uccsd_circuit_base(device)
-
+        circuit_result = preset_pennylane_uccsd_circuit(master_dictionary)
 
     return circuit_result
 
