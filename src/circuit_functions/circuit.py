@@ -1,6 +1,6 @@
 from ..ansatz.hea_ansatz.hea_ansatz import hea_circuit_base
 from ..ansatz.uccsd_ansatz.preset_pennylane_uccsd_ansatz import preset_pennylane_uccsd_circuit_base
-
+from ..ansatz.uccsd_ansatz.adaptive_uccsd import adaptive_uccsd_circuit_base
 
 def run_circuit(master_dictionary, device):
     """Create a circuit ansatz, either hea or uccsd.
@@ -22,6 +22,13 @@ def run_circuit(master_dictionary, device):
     elif ansatz_type == "preset_pennylane_uccsd":
         preset_pennylane_uccsd_circuit = preset_pennylane_uccsd_circuit_base(device)
         circuit_result = preset_pennylane_uccsd_circuit(master_dictionary)
+    elif ansatz_type == "adaptive_uccsd":
+        adaptive_uccsd_circuit = adaptive_uccsd_circuit_base(device)
+        circuit_result = adaptive_uccsd_circuit(master_dictionary)
+    else:
+        raise ValueError(
+            f"Invalid ansatz type. Use hea, preset_pennylane_uccsd or adaptive_uccsd. Current input is {ansatz_type}."
+        )
 
     return circuit_result
 

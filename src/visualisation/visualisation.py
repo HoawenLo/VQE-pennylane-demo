@@ -45,10 +45,16 @@ def create_loss_graph(output_data, master_dictionary):
     ax1.text(num_data_points - 1, fci_energy, fci_energy, fontsize=10)
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
+    molecule_chemical_symbol = master_dictionary["molecule_name"]
+
     if ansatz_type == "hea":
-        molecule_chemical_symbol = master_dictionary["molecule_name"]
         number_layers = master_dictionary["num_layers"]
         plt.title(f"Energy expectation value over {number_epochs} training epochs for {molecule_chemical_symbol} with {number_layers} layers of a hardware efficient ansatz", fontsize=16)
+    elif ansatz_type == "preset_pennylane_uccsd":
+        plt.title(f"Energy expectation value over {number_epochs} training epochs for {molecule_chemical_symbol} with a the preset unitary coupled cluster ansatz with pennylane", fontsize=16)
+    elif ansatz_type == "adaptive_uccsd":
+        plt.title(f"Energy expectation value over {number_epochs} training epochs for {molecule_chemical_symbol} with an adaptive unitary coupled cluster ansatz.", fontsize=16)
+    
     plt.xticks(fontsize=12)
     plt.yticks(fontsize=12)
     
@@ -86,8 +92,5 @@ def show_graph(show_graph):
     
     if show_graph:
         plt.show()
-        plt.close()
-    else:
-        plt.close()
 
     

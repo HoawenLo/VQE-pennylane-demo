@@ -1,5 +1,6 @@
 from .hea_ansatz.hea_ansatz import create_hea_params
 from .uccsd_ansatz.preset_pennylane_uccsd_ansatz import setup_preset_pennylane_uccsd
+from .uccsd_ansatz.adaptive_uccsd import filter_excitation_gates
 
 def package_all_inputs(molecular_dataset, yaml_parameters, ansatz_inputs):
     """Combine yaml parameters and molecular dataset parameters and combines it into one dictionary
@@ -29,13 +30,36 @@ def setup_ansatz_parameters(yaml_parameters, molecular_dataset):
     
     ansatz_type = yaml_parameters["ansatz_type"]
 
-    if ansatz_type == "hea":
+    if yaml_parameters["data_type"] == "preset":
+        num_qubits = molecular_dataset["num_qubits"]
+        num_electrons = molecular_dataset["num_electrons"]
+    elif yaml_parameters["data_type"] == "manual_inputs":
         num_qubits = yaml_parameters["num_qubits"]
+        num_electrons = yaml_parameters["num_electrons"]
+
+    if ansatz_type == "hea":
         num_layers = yaml_parameters["num_layers"]
         ansatz_parameters = create_hea_params(num_qubits, num_layers)
         return {"variational_circuit_parameters":ansatz_parameters}
     elif ansatz_type == "preset_pennylane_uccsd":
-        num_electrons = molecular_dataset["num_electrons"]
-        num_qubits = yaml_parameters["num_qubits"]
         ansatz_parameters = setup_preset_pennylane_uccsd(num_electrons, num_qubits)
+        return ansatz_parameters
+    elif ansatz_type == "adaptive_uccsd":
+        device_type = yaml_parameters["device_type"]
+        epochs = yaml_parameters["partial_doubles_circuit_epochs"]
+        gradient_threshold = yaml_parameters["gradient_threshold"]
+        partial_doubles_circuit_learning_rate = yaml_parameters["partial_doubles_circuit_learning_rate"]
+        train_type = yaml_parameters["train_type"]
+        hamiltonian = molecular_dataset["hamiltonian"]
+        
+        ansatz_parameters = filter_excitation_gates(
+            device_type,
+            epochs,
+            gradient_threshold,
+            hamiltonian,
+            train_type,
+            num_electrons,
+            num_qubits,
+            partial_doubles_circuit_learning_rate
+        )
         return ansatz_parameters

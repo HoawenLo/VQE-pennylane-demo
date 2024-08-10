@@ -39,7 +39,7 @@ def run_pipeline(config_path):
     molecular_dataset = run_pennylane_molecular_dataset_pipeline(yaml_parameters)
     ansatz_inputs = setup_ansatz_parameters(yaml_parameters, molecular_dataset)
     master_dictionary = package_all_inputs(molecular_dataset, yaml_parameters, ansatz_inputs)
-    
+
     if master_dictionary["show_circuit"]:
         display_circuit(master_dictionary)
 
@@ -56,10 +56,8 @@ def run_pipeline(config_path):
 
     logger.info(f"Creating graph of results.")
     create_loss_graph(output_data, master_dictionary)
-    show_graph(master_dictionary["show_loss_graph"])
-
     run_export_pipeline(master_dictionary["export_parameters"], master_dictionary["export_graph"], output_data)
-
+    show_graph(master_dictionary["show_loss_graph"])
     return output_data
 
 if __name__ == "__main__":

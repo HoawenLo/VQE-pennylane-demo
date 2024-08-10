@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from ..ansatz.hea_ansatz.hea_ansatz import hea_circuit_base
 from ..ansatz.uccsd_ansatz.preset_pennylane_uccsd_ansatz import preset_pennylane_uccsd_circuit_base
+from ..ansatz.uccsd_ansatz.adaptive_uccsd import adaptive_uccsd_circuit_base
 from ..circuit_functions.setup_device import setup_device
 
 def display_circuit(master_dictionary):
@@ -24,6 +25,12 @@ def display_circuit(master_dictionary):
         circuit = hea_circuit_base(device)
     elif ansatz_type == "preset_pennylane_uccsd":
         circuit = preset_pennylane_uccsd_circuit_base(device)
+    elif ansatz_type == "adaptive_uccsd":
+        circuit = adaptive_uccsd_circuit_base(device)
+    else:
+        raise ValueError(
+            f"Parameter ansatz_type is invalid. Must be hea, preset_pennylane_uccsd or adaptive uccsd. Current input is {ansatz_type}."
+        )
 
     qml.draw_mpl(circuit)(master_dictionary)
     plt.tight_layout()

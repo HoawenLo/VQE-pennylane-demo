@@ -27,7 +27,6 @@ def setup_preset_pennylane_uccsd(num_electrons, qubits):
     Returns:
         (dict) A dictionary with the hartree fock state, all single excitations, all double excitations
         all single and double excitations applied to relevant wires."""
-
     hf_state = qml.qchem.hf_state(num_electrons, qubits)
     singles, doubles = qml.qchem.excitations(num_electrons, qubits)
     s_wires, d_wires = qml.qchem.excitations_to_wires(singles, doubles)

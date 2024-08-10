@@ -1,8 +1,9 @@
+import time
+
 from catalyst import qjit
 import jax
 import jaxopt
 import numpy as np
-import torch
 
 
 from ..circuit_functions.setup_device import setup_device
@@ -50,6 +51,8 @@ def train_torch(master_dictionary, loss_fn):
     Returns:
         () """
     
+    start_time = time.time()
+
     device_type = master_dictionary["device_type"]
     epochs = master_dictionary["epochs"]
     hamiltonian = master_dictionary["hamiltonian"]
@@ -90,6 +93,8 @@ def train_torch(master_dictionary, loss_fn):
     print(f"Best loss: {best_loss:.4f}")
     print(f"Final loss: {loss:.4f}")
 
+    duration = time.time() - start_time
+    print(f"Training time: {duration:.4f}")
     output_data = create_data_dictionary(
         best_parameters,
         best_loss,
@@ -97,7 +102,8 @@ def train_torch(master_dictionary, loss_fn):
         results["params"],
         hamiltonian,
         master_dictionary["num_qubits"],
-        loss_fn
+        loss_fn,
+        duration
     )
 
     return output_data

@@ -19,7 +19,7 @@ def load_pennylane_molecule_dataset(molecule_name, bond_length):
         object."""
     logger = get_logger("Data")
 
-    logger.info(f"Loading pennylane dataset, molecule_name: {molecule_name}, bond_length{bond_length}.")
+    logger.info(f"Loading pennylane dataset, molecule_name: {molecule_name}, bond_length {bond_length}.")
     dataset = qml.data.load("qchem", molname=molecule_name, bondlength=bond_length, basis="STO-3G", attributes=["fci_energy", "hamiltonian", "molecule"])[0]
     return dataset
 
