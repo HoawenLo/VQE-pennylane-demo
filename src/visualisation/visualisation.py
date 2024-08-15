@@ -45,7 +45,10 @@ def create_loss_graph(output_data, master_dictionary):
     ax1.text(num_data_points - 1, fci_energy, fci_energy, fontsize=10)
     ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    molecule_chemical_symbol = master_dictionary["molecule_name"]
+    if master_dictionary["data_type"] == "preset":
+        molecule_chemical_symbol = master_dictionary["molecule_name"]
+    elif master_dictionary["data_type"] == "manual_inputs":
+        molecule_chemical_symbol = master_dictionary["graph_name"]
 
     if ansatz_type == "hea":
         number_layers = master_dictionary["num_layers"]

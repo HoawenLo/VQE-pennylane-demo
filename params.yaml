@@ -1,16 +1,20 @@
 device_type: "default.qubit"
 
+batch_params:
+  run_batch: True
+
 data_params:
-  data_type: "manual_inputs"
+  data_type: "preset"
 
   pennylane_molecule_dataset:
-    molecule_name: "LiH"
-    bond_length: 1.57
+    molecule_name: "H2O"
+    bond_length: 0.958
 
   manual_inputs:
     input_symbols: ["H", "H"]
     input_coordinates: [[0.3710, 0.0, 0.0], [-0.3710, 0.0, 0.0]]
     eigensolver_type: "numpy"
+    graph_name: "H2"
 
 circuit_params:
   ansatz_type: "adaptive_uccsd"
@@ -27,7 +31,7 @@ circuit_params:
 
 training_params:
   train_type: "torch"
-  epochs: 30
+  epochs: 50
   learning_rate: 0.01
   optimiser_type: "torch_adam"
 
