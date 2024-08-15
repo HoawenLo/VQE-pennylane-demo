@@ -31,8 +31,8 @@ def create_loss_graph(output_data, master_dictionary):
     fig.set_figwidth(12)
     
     num_data_points = len(output_data["loss_data"])
-    final_data_energy_expectation_value = np.round(results[-1], 4)
-    fci_energy = np.round(fci_energy, 4)
+    final_data_energy_expectation_value = np.round(results[-1], 6)
+    fci_energy = np.round(fci_energy, 6)
     # Add energy plot on column 1
     ax1 = fig.add_subplot(111)
     ax1.plot(range(0, num_data_points), results, "go", ls="dashed")

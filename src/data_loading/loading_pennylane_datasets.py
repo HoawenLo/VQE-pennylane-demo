@@ -2,6 +2,7 @@ import pennylane as qml
 from pennylane import numpy as np
 
 from ..logging.log import get_logger
+from .manual_eigensolver import solve_eigenvalues
 
 def load_pennylane_molecule_dataset(molecule_name, bond_length):
     """Load a Pennylane molecule dataset. Data provided for the molecules includes
@@ -40,12 +41,14 @@ def extract_dataset_information(molecular_dataset):
     logger.info(f"Extracted Hamiltonian, number of qubits and full configuration energy: {data}")
     return data
 
-def create_manual_hamiltonian(input_symbols, input_coordinates):
+def create_manual_hamiltonian(input_symbols, input_coordinates, eigensolver_type):
     """Create a manual molecular Hamiltonian from input symbols and coordinates.
 
     Args:
         input_symbols (list): A list of strings which have the chemical symbol of the Hamiltonian.
         input_coordinates (np.array): A numpy array of coordinates of each atom.
+        eigensolver_type (str): The name of the eigensolver, either pennylane, numpy
+            or scipy.
 
     Returns:
         (dict) A dictionary with the hamiltonian, number of qubits and number of electrons."""
@@ -64,7 +67,14 @@ def create_manual_hamiltonian(input_symbols, input_coordinates):
     print("Hamiltonian")
     print(H)
     print(f"Number of qubits: {qubits}")
-    return {"hamiltonian":H, "num_qubits":qubits}
+    eig_output = solve_eigenvalues(H, qubits, eigensolver_type)
+    return {
+        "hamiltonian":H, 
+        "num_qubits":qubits,
+        "hamiltonian_as_array":eig_output["hamiltonian_matrix"],
+        "eigenvalues":eig_output["eigenvalues"],
+        "fci_energy":eig_output["ground_state_energy"]
+    }
 
 def run_pennylane_molecular_dataset_pipeline(yaml_parameters):
     """Run the entire data pipeline for extracting the data from a pennylane molecular
@@ -86,8 +96,8 @@ def run_pennylane_molecular_dataset_pipeline(yaml_parameters):
     elif data_type == "manual_inputs":
         input_symbols = yaml_parameters["input_symbols"]
         input_coordinates = yaml_parameters["input_coordinates"]
-        data = create_manual_hamiltonian(input_symbols, input_coordinates)
-        data["fci_energy"] = yaml_parameters["fci_energy"]
+        eigensolver_type = yaml_parameters["eigensolver_type"]
+        data = create_manual_hamiltonian(input_symbols, input_coordinates, eigensolver_type)
         data["num_electrons"] = yaml_parameters["num_electrons"]
     else:
         raise ValueError(
