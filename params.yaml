@@ -1,14 +1,14 @@
 device_type: "default.qubit"
 
 batch_params:
-  run_batch: True
+  run_batch: False
 
 data_params:
   data_type: "preset"
 
   pennylane_molecule_dataset:
-    molecule_name: "H2O"
-    bond_length: 0.958
+    molecule_name: "H2"
+    bond_length: 0.86
 
   manual_inputs:
     input_symbols: ["H", "H"]
@@ -18,6 +18,7 @@ data_params:
 
 circuit_params:
   ansatz_type: "adaptive_uccsd"
+  basis_state: "jordan_wigner"
   num_qubits: 4
   num_electrons: 2
 
@@ -37,7 +38,7 @@ training_params:
 
 visualisation_params:
   show_circuit: False
-  show_loss_graph: True
+  show_loss_graph: False
 
 data_export:
   export_graph: False

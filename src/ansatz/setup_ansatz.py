@@ -42,9 +42,11 @@ def setup_ansatz_parameters(yaml_parameters, molecular_dataset):
         ansatz_parameters = create_hea_params(num_qubits, num_layers)
         return {"variational_circuit_parameters":ansatz_parameters}
     elif ansatz_type == "preset_pennylane_uccsd":
-        ansatz_parameters = setup_preset_pennylane_uccsd(num_electrons, num_qubits)
+        basis_type = yaml_parameters["basis_type"]
+        ansatz_parameters = setup_preset_pennylane_uccsd(num_electrons, num_qubits, basis_type)
         return ansatz_parameters
     elif ansatz_type == "adaptive_uccsd":
+        basis_type = yaml_parameters["basis_state"]
         device_type = yaml_parameters["device_type"]
         epochs = yaml_parameters["partial_doubles_circuit_epochs"]
         gradient_threshold = yaml_parameters["gradient_threshold"]
@@ -60,6 +62,7 @@ def setup_ansatz_parameters(yaml_parameters, molecular_dataset):
             train_type,
             num_electrons,
             num_qubits,
-            partial_doubles_circuit_learning_rate
+            partial_doubles_circuit_learning_rate,
+            basis_type
         )
         return ansatz_parameters

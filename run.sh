@@ -1,1 +1,1 @@
-python run_pipeline.py --config=params.yaml
+python3 run_pipeline.py --config=params.yaml

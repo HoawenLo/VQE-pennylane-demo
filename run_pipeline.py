@@ -95,8 +95,6 @@ def run_pipeline(config_path):
         )
 
 
-
-
 if __name__ == "__main__":
     # Create an parser
     parser = argparse.ArgumentParser("Train quantum circuit.")

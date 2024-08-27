@@ -81,16 +81,17 @@ def singles_excitations_circuit(variational_circuit_params, single_excitations, 
             qml.SingleExcitation(variational_circuit_params[i], wires=gate)
     return qml.expval(hamiltonian)
 
-def setup_hf_state(num_electrons, num_qubits):
+def setup_hf_state(num_electrons, num_qubits, basis_type):
     """Setup the initial Hartree Fock state.
 
     Args:
         num_electrons (int): The number of electrons.
         num_qubits (int): The number of qubits.
+        basis_type (str): The mapping basis states of the qubit operators.
 
     Returns:
         (numpy.ndarray) The hartree fock state."""
-    return qml.qchem.hf_state(num_electrons, num_qubits)
+    return qml.qchem.hf_state(num_electrons, num_qubits, basis=basis_type)
 
 def setup_device(device_type, num_qubits):
     """Setup the device.
@@ -206,8 +207,7 @@ def truncate_singles_circuit(device, singles, doubles_select, params_doubles, gr
     selected_excitations = select_parameters(singles, grads, gradient_threshold)
     return selected_excitations
 
-
-def filter_excitation_gates(device_type, epochs, gradient_threshold, hamiltonian, train_type, num_electrons, num_qubits, partial_doubles_circuit_learning_rate):
+def filter_excitation_gates(device_type, epochs, gradient_threshold, hamiltonian, train_type, num_electrons, num_qubits, partial_doubles_circuit_learning_rate, basis_type):
     """Filter both single and double excitation gates by calculating their gradient contributions and 
     if they are below a gradient threshold value discard them.
 
@@ -220,16 +220,20 @@ def filter_excitation_gates(device_type, epochs, gradient_threshold, hamiltonian
         num_electrons (int): The number of electrons of the quantum system.
         num_qubits (int): The number of qubits of the quantum circuit.
         partial_doubles_circuit_learning_rate (float): The learning rate of the partial doubles circuit.
+        basis_type (str): The mapping basis states of the qubit operators.
 
     Returns:
         (list) A list of the gates which were above the gradient threshold."""
 
     device = setup_device(device_type, num_qubits)
-    hf_state = setup_hf_state(num_electrons, num_qubits)
+    hf_state = setup_hf_state(num_electrons, num_qubits, basis_type=basis_type)
     singles, doubles = calculate_excitations(num_electrons, num_qubits)
     partial_doubles_circuit_cost_fn = create_cost_function(device, base_circuit)
 
     selected_doubles = truncate_doubles_circuit(partial_doubles_circuit_cost_fn, doubles, gradient_threshold, hf_state, num_qubits, hamiltonian)
+
+    
+
     params_doubles = train_truncated_doubles_circuit(
         partial_doubles_circuit_learning_rate, 
         selected_doubles, 
@@ -251,11 +255,13 @@ def filter_excitation_gates(device_type, epochs, gradient_threshold, hamiltonian
         hamiltonian
     )
 
-    selected_excitation_gates = selected_doubles + selected_singles
+    print("selected excitation gates                ", selected_singles)
 
+    selected_excitation_gates = selected_doubles + selected_singles
+    
     if train_type == "torch":
-        variational_circuit_parameters = torch.randn(len(selected_excitation_gates), requires_grad=True) * 0.1
-        variational_circuit_parameters = torch.nn.Parameter(variational_circuit_parameters)
+        variational_circuit_parameters = torch.randn(len(selected_excitation_gates), requires_grad=False) * 0.1
+        variational_circuit_parameters = torch.nn.Parameter(variational_circuit_parameters, requires_grad=True)
     else:
         raise ValueError(
             f"Invalid parameter train_type. Should be torch, jax or pennylane but instead is {train_type}."
@@ -291,10 +297,11 @@ def adaptive_uccsd_circuit_base(device):
         hamiltonian = master_dictionary["hamiltonian"]
         num_qubits = master_dictionary["num_qubits"]
         num_electrons = master_dictionary["num_electrons"]
+        basis_type = master_dictionary["basis_state"]
         variational_circuit_params = master_dictionary["ansatz_config_params"]["variational_circuit_parameters"]
         selected_excitation_gates = master_dictionary["ansatz_config_params"]["selected_excitation_gates"]
 
-        hf_state = qml.qchem.hf_state(num_electrons, num_qubits)
+        hf_state = setup_hf_state(num_electrons, num_qubits, basis_type)
 
         qml.BasisState(hf_state, wires=range(num_qubits))
         for i, excitation_gate in enumerate(selected_excitation_gates):

@@ -49,7 +49,7 @@ def train_torch(master_dictionary, loss_fn):
             input parameters.
         loss_fn (function): The quantum circuit.
     Returns:
-        () """
+        (dict) A dictionary of the output data. See create_data_dictionary."""
     
     start_time = time.time()
 
@@ -60,7 +60,6 @@ def train_torch(master_dictionary, loss_fn):
     optimiser_type = master_dictionary["optimiser_type"]
     num_qubits = master_dictionary["num_qubits"]
     variational_circuit_params = master_dictionary["ansatz_config_params"]["variational_circuit_parameters"]
-
     device = setup_device(device_type, num_qubits)
 
     # Set up optimiser.
@@ -69,6 +68,9 @@ def train_torch(master_dictionary, loss_fn):
 
     results = {"params":[], 
                "energy_expectation_value":[]}
+
+    print("train.py", variational_circuit_params.requires_grad)
+    print(variational_circuit_params)
 
     # Training loop
     for i in range(epochs):
@@ -109,27 +111,24 @@ def train_torch(master_dictionary, loss_fn):
     return output_data
 
 # @qjit
-def train_jax(ansatz_type, ansatz_config_params, variational_circuit_params, epochs, device, hamiltonian, loss_fn):
+def train_jax(master_dictionary, loss_fn):
     """Train the variational quantum circuit using a Jax optimiser.
     
     Args:
-        ansatz_type (str): The circuit ansatz type to be created.
-        ansatz_config_params (dict): The parameters for each ansatz type contained
-            within a dictionary.
-        variational_circuit_params (torch.Tensor): The variational circuit parameters that
-            are optimised to find the best quantum circuit.
-        device (pennylane.devices): The quantum hardware to be used.
-        hamiltonian (pennylane.Hamiltonian): The hamiltonian to minimise the
-            energy expectation value for.
+        master_dictionary (dict): A dictionary which holds all yaml parameters, molecular data values and ansatz
+            input parameters.
         loss_fn (function): The quantum circuit.
-    
     Returns:
-        (tuple) Returns a tuple of the final parameters and the final loss function value."""
-    device = setup_device(device, ansatz_config_params["num_qubits"])
+        (dict) A dictionary of the output data. See create_data_dictionary."""
+    
+    device_type = master_dictionary["device_type"]
+    num_qubits = master_dictionary["num_qubits"]
+
+    device = setup_device(device_type, num_qubits)
 
     # Set up optimiser.
     opt = jaxopt.GradientDescent(loss_fn, stepsize=0.4, value_and_grad=True)
-
+    state = opt.init_state(master_dictionary, device)
     results = {"theta_param":[], 
                "energy_expectation_value":[]}
 
@@ -137,14 +136,12 @@ def train_jax(ansatz_type, ansatz_config_params, variational_circuit_params, epo
     for i in range(epochs):
         # Run both the forward pass and calculate cost function.
         # Remember cost function is the expectation value.
-        loss = loss_fn(ansatz_type, ansatz_config_params, variational_circuit_params, device, hamiltonian)
-        update = lambda i, args: tuple(opt.update(*args))
+        loss = loss_fn()
 
+        # results["theta_param"].append(parameter_value)
+        # results["energy_expectation_value"].append(loss.detach().numpy())
 
-        results["theta_param"].append(parameter_value)
-        results["energy_expectation_value"].append(loss.detach().numpy())
-
-        print(f"Epoch {i + 1}: Loss = {loss.item():.8f} Ha, Theta = {variational_circuit_params.detach().numpy()}")
+        # print(f"Epoch {i + 1}: Loss = {loss.item():.8f} Ha, Theta = {variational_circuit_params.detach().numpy()}")
 
     print(f"Final parameters: {variational_circuit_params}")
     print(f"Final loss: {loss:.4f}")
