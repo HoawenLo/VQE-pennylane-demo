@@ -17,13 +17,13 @@ data_params:
     graph_name: "H2"
 
 circuit_params:
-  ansatz_type: "adaptive_uccsd"
+  ansatz_type: "hea"
   basis_state: "jordan_wigner"
   num_qubits: 4
   num_electrons: 2
 
   # Hardware efficient ansatz params
-  num_layers: 30
+  num_layers: 3
 
   # Adaptive unitary coupled cluster ansatz params
   gradient_threshold: 0.00001
@@ -37,7 +37,7 @@ training_params:
   optimiser_type: "torch_adam"
 
 visualisation_params:
-  show_circuit: False
+  show_circuit: True
   show_loss_graph: False
 
 data_export:
