@@ -95,7 +95,7 @@ def hea_circuit_base(device):
                 
         Returns:
             (torch.Tensor.float) The expectation value of the Hamiltonian."""
-        
+
         num_qubits = master_dictionary["num_qubits"]
         num_layers = master_dictionary["num_layers"]
         variational_circuit_params = master_dictionary["ansatz_config_params"]["variational_circuit_parameters"]

@@ -1,5 +1,7 @@
 device_type: "default.qubit"
 
+jit_enabled: False
+
 batch_params:
   run_batch: False
 
@@ -7,8 +9,8 @@ data_params:
   data_type: "preset"
 
   pennylane_molecule_dataset:
-    molecule_name: "H2"
-    bond_length: 0.86
+    molecule_name: "LiH"
+    bond_length: 0.9
 
   manual_inputs:
     input_symbols: ["H", "H"]
@@ -17,13 +19,13 @@ data_params:
     graph_name: "H2"
 
 circuit_params:
-  ansatz_type: "hea"
+  ansatz_type: "adaptive_uccsd"
   basis_state: "jordan_wigner"
   num_qubits: 4
   num_electrons: 2
 
   # Hardware efficient ansatz params
-  num_layers: 3
+  num_layers: 10
 
   # Adaptive unitary coupled cluster ansatz params
   gradient_threshold: 0.00001
@@ -32,14 +34,14 @@ circuit_params:
 
 training_params:
   train_type: "torch"
-  epochs: 50
+  epochs: 30
   learning_rate: 0.01
   optimiser_type: "torch_adam"
 
 visualisation_params:
-  show_circuit: True
+  show_circuit: False
   show_loss_graph: False
 
 data_export:
-  export_graph: False
-  export_parameters: False
+  export_graph: True
+  export_parameters: True

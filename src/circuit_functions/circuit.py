@@ -1,7 +1,10 @@
 from ..ansatz.hea_ansatz.hea_ansatz import hea_circuit_base
+from ..ansatz.hea_ansatz.hea_ansatz_jit import hea_circuit_base_jit
 from ..ansatz.uccsd_ansatz.preset_pennylane_uccsd_ansatz import preset_pennylane_uccsd_circuit_base
 from ..ansatz.uccsd_ansatz.adaptive_uccsd import adaptive_uccsd_circuit_base
 
+def hea_circuits(jit_enabled):
+    pass
 def run_circuit(master_dictionary, device):
     """Create a circuit ansatz, either hea or uccsd.
     

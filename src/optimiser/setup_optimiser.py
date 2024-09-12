@@ -1,4 +1,5 @@
 import torch
+import optax
 
 def setup_optimiser(optimiser_type):
     """Returns an optimiser.
@@ -11,3 +12,5 @@ def setup_optimiser(optimiser_type):
     
     if optimiser_type == "torch_adam":
         return torch.optim.Adam
+    elif optimiser_type == "jax_sgd":
+        return optax.sgd
