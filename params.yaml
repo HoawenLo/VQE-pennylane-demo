@@ -6,7 +6,7 @@ batch_params:
   run_batch: False
 
 data_params:
-  data_type: "preset"
+  data_type: "manual_inputs"
 
   pennylane_molecule_dataset:
     molecule_name: "LiH"
@@ -14,7 +14,7 @@ data_params:
 
   manual_inputs:
     input_symbols: ["H", "H"]
-    input_coordinates: [[0.3710, 0.0, 0.0], [-0.3710, 0.0, 0.0]]
+    input_coordinates: [[0.0, 0.0, 0.0], [-0.3710, 0.0, 0.0]]
     eigensolver_type: "numpy"
     graph_name: "H2"
 
